@@ -24,4 +24,4 @@ file_type = thumbnail_url.split('.')[-1]
 subprocess.run(['curl', thumbnail_url, '--output', f'thumbnails/{id}.{file_type}'])
 
 # download video
-subprocess.run(['youtube-dl', '-o', '~/Documents/download-twitch-vod/videos/%(id)s.%(ext)s', f'https://www.twitch.tv/videos/{id}'])
+subprocess.run(['youtube-dl', '-o', f'./videos/{id}.%(ext)s', f'https://www.twitch.tv/videos/{id}'])
