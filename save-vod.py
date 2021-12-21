@@ -6,7 +6,7 @@ import json
 id = sys.argv[1]
 
 # get current json index file
-json_file = open('metadata/index.json')
+json_file = open('metadata.json')
 json_data = json.load(json_file)
 json_file.close()
 
@@ -15,7 +15,7 @@ video_metadata = json.loads(subprocess.run(['twcli', 'api', 'get', 'videos', '-q
 json_data[id] = video_metadata['data'][0]
 
 # write to index json file
-with open('metadata/index.json', 'w', encoding='utf-8') as f:
+with open('metadata.json', 'w', encoding='utf-8') as f:
   json.dump(json_data, f, ensure_ascii=False, indent=2)
 
 # download thumbnail
