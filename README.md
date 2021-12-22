@@ -53,7 +53,9 @@ Install youtube-dl [here](https://github.com/ytdl-org/youtube-dl#installation).
 
 Description goes here
 
-`./dl-vod [OPTIONS] ID`
+```
+./dl-vod [OPTIONS] ID
+```
 
 ### Output
 
@@ -122,11 +124,17 @@ The metadata file looks like this:
 
 ```
 -h, --help                    show this help message and exit
+-v, --video-path PATH         specify a different directory for video to be 
+                              downoaded
+-t, --thumb-path PATH         specify a different directory for thumbnail to be 
+                              downoaded
+-m, --meta-file FILE          specify a different file for metadata to be read 
+                              & saved
 --no-vid                      don't download video
+--no-meta                     don't download metadata
+--no-thumb                    don't download thumbnail
 ```
 
 
 ## Issues
-
-
 ## License
