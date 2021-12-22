@@ -131,8 +131,8 @@ The metadata file looks like this:
 -m, --meta-file FILE          specify a different file for metadata to be read 
                               & saved
 --no-vid                      don't download video
---no-meta                     don't download metadata
 --no-thumb                    don't download thumbnail
+--no-meta                     don't download metadata
 ```
 
 
