@@ -113,7 +113,7 @@ The metadata file looks like this:
     "user_name": "TubboLIVE",
     "view_count": 113215,
     "viewable": "public"
-  },
+  }
 }
 ```
 
