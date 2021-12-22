@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+
+import subprocess
+import json
+import argparse
+
+# define arguments
+parser = argparse.ArgumentParser(description='Download twitch vod, thumbnail, and metadata.')
+parser.add_argument('id', metavar='ID', type=int, help='the vod id')
+parser.add_argument('--no-vid', dest='no_vid', action='store_true', help='don\'t download video')
+args = parser.parse_args()
+
+# get current json index file
+json_file = open('metadata.json')
+json_data = json.load(json_file)
+json_file.close()
+
+# get vod metadata 
+video_metadata = json.loads(subprocess.run(['twitch', 'api', 'get', 'videos', '-q', f'id={args.id}'], stdout=subprocess.PIPE).stdout.decode('utf-8'))
+json_data[str(args.id)] = video_metadata['data'][0]
+
+# write to index json file
+with open('metadata.json', 'w', encoding='utf-8') as f:
+  json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+# download thumbnail
+thumbnail_url = json_data[str(args.id)]['thumbnail_url'].replace('%{width}', '1280').replace('%{height}', '720')
+file_type = thumbnail_url.split('.')[-1]
+subprocess.run(['curl', thumbnail_url, '--output', f'thumbnails/{args.id}.{file_type}'])
+
+# download video
+if not args.no_vid: 
+  subprocess.run(['youtube-dl', '-o', f'./videos/{args.id}.%(ext)s', f'https://www.twitch.tv/videos/{args.id}'])
