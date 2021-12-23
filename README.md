@@ -4,9 +4,6 @@ This is a small python script that downloads a Twitch VOD along with its metadat
 
 - [Installation](#installation)
 - [Dependencies](#dependencies)
-  - [Twitch CLI](#twitch-cli)
-  - [cURL](#curl)
-  - [youtube-dl](#youtube-dl)
 - [Usage](#usage)
 - [Options](#options)
 - [Issues](#issues)
@@ -17,8 +14,11 @@ This is a small python script that downloads a Twitch VOD along with its metadat
 
 First, be sure all the dependencies are installed and configured. Information on that is down bellow in the [dependencies](#dependencies) section.
 
-Add how to install instructions!
+Run the following command to install the script:
 
+```
+curl
+```
 
 ## Dependencies
 
@@ -51,19 +51,19 @@ Install youtube-dl [here](https://github.com/ytdl-org/youtube-dl#installation).
 
 ## Usage
 
-Description goes here
+dl-vod is a command-line script to download Twitch VODs along with their metadata and thumbnail. It requires the Python interpreter, the Twitch CLI, cURL, and youtube-dl.
 
 ```
-./dl-vod [OPTIONS] ID
+dl-vod [OPTIONS] ID
 ```
 
-### Output
+### Default Output
 
 - The metadata is appended to a file called `metadata.json` in the current directory.
 - The thumbnail is added to a `thumbnails` folder in the current directory.
 - The video is added to a `videos` folder in the current directory.
 
-The file structure looks like this:
+The default file structure looks like this:
 
 ```
 working-directory
@@ -74,7 +74,7 @@ working-directory
 └── metadata.json
 ```
 
-The metadata file looks like this:
+The json file looks like this:
 
 ```JSON
 {
@@ -96,45 +96,34 @@ The metadata file looks like this:
     "user_name": "Tubbo",
     "view_count": 525420,
     "viewable": "public"
-  },
-  "1237772702": {
-    "created_at": "2021-12-19T14:30:12Z",
-    "description": "",
-    "duration": "1h50m2s",
-    "id": "1237772702",
-    "language": "en",
-    "muted_segments": null,
-    "published_at": "2021-12-19T14:30:12Z",
-    "stream_id": "44114517644",
-    "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/dgeft87wbj63p/283065165a7906da8355_tubbolive_44114517644_1639924203//thumb/thumb0-%{width}x%{height}.jpg",
-    "title": "secret v2",
-    "type": "archive",
-    "url": "https://www.twitch.tv/videos/1237772702",
-    "user_id": "478701870",
-    "user_login": "tubbolive",
-    "user_name": "TubboLIVE",
-    "view_count": 113215,
-    "viewable": "public"
   }
 }
 ```
-
 
 ## Options
 
 ```
 -h, --help                    show this help message and exit
--v, --video-path PATH         specify a different directory for video to be 
-                              downoaded
--t, --thumb-path PATH         specify a different directory for thumbnail to be 
-                              downoaded
--m, --meta-file FILE          specify a different file for metadata to be read 
-                              & saved
---no-vid                      don't download video
---no-thumb                    don't download thumbnail
---no-meta                     don't download metadata
+--alt-cli COMMAND             specify a different command for calling the 
+                              twitch cli
 ```
 
+### Output
+```
+-m, --meta-file FILE          specify a different file for metadata to be read 
+                              & saved
+-t, --thumb-path PATH         specify a different directory for thumbnail to be 
+                              downoaded
+-v, --video-path PATH         specify a different directory for video to be 
+                              downoaded
+--no-meta                     don't download metadata
+--no-thumb                    don't download thumbnail
+--no-vid                      don't download video
+```
 
 ## Issues
+
+Bugs and suggestions can be reported on this project's [Github issues page](https://github.com/mackrusing/download-twitch-vod/issues). 
+
+
 ## License
