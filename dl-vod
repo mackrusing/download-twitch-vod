@@ -4,49 +4,138 @@ import subprocess
 import json
 import argparse
 import sys
+from pathlib import Path
 
-# define arguments
-parser = argparse.ArgumentParser(description='Download twitch vod along with its thumbnail and metadata.')
-parser.add_argument('id', metavar='ID', type=int, help='the vod id')
-parser.add_argument('-v', '--video-path', dest='video_path', metavar='PATH', nargs='?', default='./videos', help='specify a different directory for video to be downoaded')
-parser.add_argument('-t', '--thumb-path', dest='thumbnail_path', metavar='PATH', nargs='?', default='./thumbnails', help='specify a different directory for thumbnail to be downoaded')
-parser.add_argument('-m', '--meta-file', dest='meta_path', metavar='FILE', nargs='?', default='./metadata.json', help='specify a different file for metadata to be read & saved')
-parser.add_argument('--no-vid', dest='no_vid', action='store_true', help='don\'t download video')
-parser.add_argument('--no-thumb', dest='no_thumb', action='store_true', help='don\'t download thumbnail')
-parser.add_argument('--no-meta', dest='no_meta', action='store_true', help='don\'t download metadata')
+
+# script argument parser
+parser = argparse.ArgumentParser(
+  description='Download twitch vod along with its thumbnail and metadata.'
+)
+parser.add_argument(
+  'id', 
+  metavar='ID', 
+  type=int, 
+  help='the vod id'
+)
+parser.add_argument(
+  '--alt-cli', 
+  dest='cli_command', 
+  metavar='COMMAND', 
+  nargs='?', 
+  default='twitch', 
+  help='specify a different command for calling the twitch cli'
+)
+parser.add_argument(
+  '-m', '--meta-file', 
+  dest='meta_path', 
+  metavar='FILE', 
+  nargs='?', 
+  default=Path('metadata.json'), 
+  help='specify a different file for metadata to be read & saved'
+)
+parser.add_argument(
+  '-t', '--thumb-path', 
+  dest='thumbnail_path', 
+  metavar='PATH', 
+  nargs='?', 
+  default=Path('thumbnails'), 
+  help='specify a different directory for thumbnail to be downloaded'
+)
+parser.add_argument(
+  '-v', '--video-path', 
+  dest='video_path', 
+  metavar='PATH', 
+  nargs='?', 
+  default=Path('videos'), 
+  help='specify a different directory for video to be downoaded'
+)
+parser.add_argument(
+  '--no-meta', 
+  dest='no_meta', 
+  action='store_true', 
+  help="don't download metadata"
+)
+parser.add_argument(
+  '--no-thumb', 
+  dest='no_thumb', 
+  action='store_true', 
+  help="don't download thumbnail"
+)
+parser.add_argument(
+  '--no-vid', 
+  dest='no_vid', 
+  action='store_true', 
+  help="don't download video"
+)
 args = parser.parse_args()
+
 
 # convert id to string (for json)
 args.id = str(args.id)
 
-# ensure file paths are consistent
-if args.video_path[-1] != '/':
-  args.video_path += '/'
-if args.thumbnail_path[-1] != '/':
-  args.thumbnail_path += '/'
 
-# read json metadata file + 
-json_file = open(args.meta_path)
-json_data = json.load(json_file)
-json_file.close()
+# make file paths consistent
+args.video_path = Path(args.video_path)
+args.thumbnail_path = Path(args.thumbnail_path)
+args.meta_path = Path(args.meta_path)
 
-# get vod metadata 
-video_metadata = json.loads(subprocess.run(['twitch', 'api', 'get', 'videos', '-q', f'id={args.id}'], stdout=subprocess.PIPE).stdout.decode('utf-8'))
-if video_metadata['data'] == []:
-  sys.exit(f'dl-vod: error: 404 not found: video with id \'{args.id}\' not found')
-json_data[args.id] = video_metadata['data'][0]
 
-# update metadata json file
-if not args.no_meta:
+# get metadata
+def get_metadata(vod_id):
+  metadata = json.loads(subprocess.run([args.cli_command, 'api', 'get', 'videos', '-q', f'id={vod_id}'], stdout=subprocess.PIPE).stdout.decode('utf-8'))
+  if metadata['data'] == []:
+    sys.exit(f"dl-vod: error: 404 not found: vod with id '{args.id}' not found")
+  else:
+    return metadata['data'][0]
+
+
+# add metadata to json
+def add_metadata_to_json(metadata):
+  if not args.meta_path.exists(): 
+    sys.exit(f"dl-vod: error: non-existent file: the file at '{args.meta_path}' does not exist")
+  json_file = open(args.meta_path)
+  all_metadata = json.load(json_file)
+  json_file.close()
+  all_metadata[metadata['id']] = metadata
   with open(args.meta_path, 'w', encoding='utf-8') as f:
-    json.dump(json_data, f, ensure_ascii=False, indent=2)
+    json.dump(all_metadata, f, ensure_ascii=False, indent=2)
+
 
 # download thumbnail
-if not args.no_thumb:
-  thumbnail_url = json_data[args.id]['thumbnail_url'].replace('%{width}', '1280').replace('%{height}', '720')
-  file_type = thumbnail_url.split('.')[-1]
-  subprocess.run(['curl', thumbnail_url, '--output', f'{args.thumbnail_path}{args.id}.{file_type}'])
+def download_thumbnail(metadata):
+  if not args.thumbnail_path.exists(): 
+    sys.exit(f"dl-vod: error: non-existent directory: the directory at '{args.thumbnail_path}' does not exist")
+  thumbnail_url = metadata['thumbnail_url'].replace('%{width}', '1280').replace('%{height}', '720')
+  file_extention = thumbnail_url.split('.')[-1]
+  filename = f'{metadata["id"]}.{file_extention}'
+  subprocess.run(['curl', thumbnail_url, '--output', Path(args.thumbnail_path, filename)])
+
 
 # download video
-if not args.no_vid: 
-  subprocess.run(['youtube-dl', '-o', f'{args.video_path}{args.id}.%(ext)s', f'https://www.twitch.tv/videos/{args.id}'])
+def download_video(metadata):
+  if not args.video_path.exists(): 
+    sys.exit(f"dl-vod: error: non-existent directory: the directory at '{args.video_path}' does not exist")
+  filename = f'{metadata["id"]}.%(ext)s'
+  subprocess.run(['youtube-dl', '-o', Path(args.video_path, filename), f'https://www.twitch.tv/videos/{metadata["id"]}'])
+
+
+# check file exists
+def check_file_exists(flag, file):
+  if not flag and not file.exists(): 
+    sys.exit(f"dl-vod: error: non-existent file: the file at '{file}' does not exist")
+
+
+# check for files
+check_file_exists(args.no_meta, args.meta_path)
+check_file_exists(args.no_thumb, args.thumbnail_path)
+check_file_exists(args.no_vid, args.video_path)
+
+
+# perform downloads
+video_metadata = get_metadata(args.id)
+if not args.no_meta:
+  add_metadata_to_json(video_metadata)
+if not args.no_thumb:
+  download_thumbnail(video_metadata)
+if not args.no_vid:
+  download_video(video_metadata)
