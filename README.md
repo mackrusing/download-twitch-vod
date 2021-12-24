@@ -17,7 +17,8 @@ First, be sure all the dependencies are installed and configured. Information on
 Run the following command to install the script:
 
 ```
-curl
+sudo curl -L https://github.com/mackrusing/download-twitch-vod/releases/download/v1.0.0/dl-vod -o /usr/local/bin/dl-vod
+sudo chmod a+rx /usr/local/bin/dl-vod
 ```
 
 ## Dependencies
