@@ -14,7 +14,7 @@ This is a small python script that downloads a Twitch VOD along with its metadat
 
 First, be sure all the dependencies are installed and configured. Information on that is down bellow in the [dependencies](#dependencies) section.
 
-Run the following command to install the script:
+Run the following commands to install the script:
 
 ```
 sudo curl -L https://github.com/mackrusing/download-twitch-vod/releases/download/v1.0.0/dl-vod -o /usr/local/bin/dl-vod
