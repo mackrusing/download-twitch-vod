@@ -7,7 +7,6 @@ This is a small python script that downloads a Twitch VOD along with its metadat
 - [Usage](#usage)
 - [Options](#options)
 - [Issues](#issues)
-- [License](#license)
 
 
 ## Installation
