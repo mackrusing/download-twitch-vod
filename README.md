@@ -51,20 +51,37 @@ Install youtube-dl [here](https://github.com/ytdl-org/youtube-dl#installation).
 
 ## Usage
 
-dl-vod is a command-line script to download Twitch VODs along with their metadata and thumbnail. It requires the Python interpreter, the Twitch CLI, cURL, and youtube-dl.
+dl-vod is a command-line script to download Twitch VODs along with their metadata and thumbnail. It requires a Python3+ interpreter, the Twitch CLI, cURL, and youtube-dl.
 
 ```
 dl-vod [OPTIONS] ID
 ```
 
-### Default Output
+### Default output
 
-- The metadata is appended to a file called `metadata.json` in the current directory.
+The default output assumes a preexisting file structure (shown in the example). The output locations can be changed by using the `-m`, `-t`, and `-v` flags (see [options section](#options) below).
+
+- The metadata is appended to a file called `metadata.json` in the current directory (make sure that this file has an empty object).
 - The thumbnail is added to a `thumbnails` folder in the current directory.
 - The video is added to a `videos` folder in the current directory.
 
-The default file structure looks like this:
+Here is an example of the file structure and JSON file before and after running `dl-vod 1197183589`
 
+Before:
+```
+working-directory
+├── thumbnails
+├── videos
+└── metadata.json
+```
+
+```JSON
+{
+  
+}
+```
+
+After:
 ```
 working-directory
 ├── thumbnails
@@ -73,8 +90,6 @@ working-directory
 │   └── 1153531342.mp4
 └── metadata.json
 ```
-
-The json file looks like this:
 
 ```JSON
 {
@@ -123,7 +138,4 @@ The json file looks like this:
 
 ## Issues
 
-Bugs and suggestions can be reported on this project's [Github issues page](https://github.com/mackrusing/download-twitch-vod/issues). 
-
-
-## License
+Bugs and suggestions can be reported on this project's [GitHub issues page](https://github.com/mackrusing/download-twitch-vod/issues). If possible, please do not send bug reports to my email.
